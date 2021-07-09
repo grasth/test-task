@@ -1,22 +1,20 @@
-package com.company.grasth;
-
+import java.io.File;
 import java.io.FileReader;
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.Arrays;
-import java.util.Locale;
 import java.util.Scanner;
 
-public class Main {
+public class task1 {
+
     public static DecimalFormat df=new DecimalFormat("0.00");
 
     public static void main(String[] args) throws Exception{
         try {
             String[] lines = readFile(args[0]);
             System.out.println(String.format("%.2f", percentile(lines, 90.0)).replace(',', '.'));
-            System.out.println(String.format("%.2f", mediana(lines)).replace(',', '.'));
-            System.out.println(String.format("%.2f", min(lines)).replace(',', '.'));
+            System.out.println(String.format("%.2f", percentile(lines, 50.0)).replace(',', '.'));
             System.out.println(String.format("%.2f", max(lines)).replace(',', '.'));
+            System.out.println(String.format("%.2f", min(lines)).replace(',', '.'));
             System.out.println(String.format("%.2f", avg(lines)).replace(',', '.'));
         }
         catch (Exception e){
@@ -56,20 +54,13 @@ public class Main {
 
     public static double percentile(String[] array, double percent) {
         int[] intArray = convertToInt(array);
-        double pos = percent * (array.length - 1) / 100;
-        int ind = (int) (pos - (pos % 2));
-        int first = intArray[ind];
-        int second = intArray[intArray.length - 1];
-        return first + (pos - ind) * (second - first);
-
-    }
-
-    public static double mediana(String[] array){
-        int[] intArray = convertToInt(array);
-        if(intArray.length%2  == 0){
-            return ((double)intArray[intArray.length/2] + (double)intArray[intArray.length/2 - 1])/2;
+        double res = (double) ((percent/100.0)*(intArray.length-1))+1.0;
+        double remainder =  Math.round((res - (int)res)* 100.0) / 100.0;
+        int index = (int)(res - remainder);
+        if(index < intArray.length-1) {
+            return (intArray[index-1]) + remainder * (intArray[index] - intArray[index-1]);
         } else {
-            return (double)intArray[intArray.length/2];
+            return (intArray[index-1]) + (remainder * (intArray[intArray.length-1] - intArray[index-1]));
         }
     }
 
@@ -87,13 +78,10 @@ public class Main {
         int[] intArray = convertToInt(array);
         double sum = 0;
         for (var item:
-             intArray) {
+                intArray) {
             sum+=item;
         }
 
         return sum/intArray.length;
     }
-
-
-
 }
